@@ -9,8 +9,8 @@ android {
 
     defaultConfig {
         applicationId "com.victorb.andirstat"
-        minSdkVersion 28
-        targetSdkVersion 28
+        minSdkVersion 23
+        targetSdkVersion 26
         versionCode 100000
         versionName "0.1.0"
 
