@@ -10,7 +10,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:max="100"
-        android:progress="50"
         android:progressDrawable="@drawable/progress_bar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,7 +26,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_baseline_insert_drive_file_24" />
+        app:srcCompat="@drawable/ic_file" />
 
     <TextView
         android:id="@+id/filename"

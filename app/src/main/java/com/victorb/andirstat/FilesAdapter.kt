@@ -7,7 +7,6 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import java.io.File
 
 class FilesAdapter() : RecyclerView.Adapter<FilesAdapter.ViewHolder>() {
     private val fileList: FileList = FileList()
@@ -35,14 +34,14 @@ class FilesAdapter() : RecyclerView.Adapter<FilesAdapter.ViewHolder>() {
         )
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.fileName.text = dataSet[position].name
-        holder.fileSize.text = (dataSet[position].size / 1000000).toString() + " MB"
-        holder.sizeBar.progress = (100 * (dataSet[position].size.toFloat() / dataSet[position].parentSize.toFloat())).toInt()
-        holder.sizeBar.max = 100
-        holder.iconView.setImageResource(if (dataSet[position].isDirectory) R.drawable.ic_baseline_folder_24 else R.drawable.ic_baseline_insert_drive_file_24)
-        if (dataSet[position].isDirectory) {
+        val file: FileInfos = dataSet[position]
+        holder.fileName.text = file.name
+        holder.fileSize.text = (file.size / 1000000).toString() + " MB"
+        holder.sizeBar.progress = (100 * (file.size.toFloat() / file.parentSize.toFloat())).toInt()
+        holder.iconView.setImageResource(if (file.isDirectory) R.drawable.ic_folder else R.drawable.ic_file)
+        if (file.isDirectory) {
             holder.itemView.setOnClickListener {
-                dataSet = fileList.getDirectoryFiles(dataSet[position].path)
+                dataSet = fileList.getDirectoryFiles(file.path)
                 notifyDataSetChanged()
             }
         }
