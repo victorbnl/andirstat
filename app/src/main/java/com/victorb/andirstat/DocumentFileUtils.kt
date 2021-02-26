@@ -32,14 +32,14 @@ fun getFolderSize(folder: DocumentFile): Long {
 
 // https://stackoverflow.com/questions/3758606/how-can-i-convert-byte-size-into-a-human-readable-format-in-java
 fun fileSizeToHumanReadable(bytes: Long): String? {
-    var bytes = bytes
-    if (-1000 < bytes && bytes < 1000) {
-        return "$bytes B"
+    var lbytes = bytes
+    if (-1000 < lbytes && lbytes < 1000) {
+        return "$lbytes B"
     }
     val ci: CharacterIterator = StringCharacterIterator("kMGTPE")
-    while (bytes <= -999950 || bytes >= 999950) {
-        bytes /= 1000
+    while (lbytes <= -999950 || lbytes >= 999950) {
+        lbytes /= 1000
         ci.next()
     }
-    return java.lang.String.format("%.1f %cB", bytes / 1000.0, ci.current())
+    return java.lang.String.format("%.1f %cB", lbytes / 1000.0, ci.current())
 }
