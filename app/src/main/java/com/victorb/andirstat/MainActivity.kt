@@ -43,25 +43,6 @@ class MainActivity : AppCompatActivity() {
         initAdapterWithRootFolder()
     }
 
-    private fun checkPermissionsAndInitRecyclerView(context: Context) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-                if (!isGranted) {
-                    Toast.makeText(
-                        this,
-                        "Please allow the app to access your files",
-                        Toast.LENGTH_LONG
-                    ).show()
-                } else {
-                    initAdapterWithRootFolder()
-                }
-            }
-            requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-        } else {
-            initAdapterWithRootFolder()
-        }
-    }
-
     private fun initAdapterWithRootFolder() {
         storageHelper.onFolderSelected = { _: Int, folder: DocumentFile ->
             Toast.makeText(this, "Scanning your files, tout vient à qui sait attendre", Toast.LENGTH_LONG).show()
