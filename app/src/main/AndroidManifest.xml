@@ -14,7 +14,7 @@
         android:theme="@style/Theme.AnDirStat"
 
         android:requestLegacyExternalStorage="true">
-        <activity android:name=".MainActivity" >
+        <activity android:name=".activities.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

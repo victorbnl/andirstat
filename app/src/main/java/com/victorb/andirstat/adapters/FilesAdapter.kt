@@ -1,4 +1,4 @@
-package com.victorb.andirstat
+package com.victorb.andirstat.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +9,8 @@ import android.widget.TextView
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.RecyclerView
 import com.anggrayudi.storage.file.absolutePath
+import com.victorb.andirstat.*
+import com.victorb.andirstat.data.FileInfos
 
 class FilesAdapter() : RecyclerView.Adapter<FilesAdapter.ViewHolder>() {
     private lateinit var rootFolder: DocumentFile

@@ -1,4 +1,4 @@
-package com.victorb.andirstat
+package com.victorb.andirstat.data
 
 data class FileInfos(
         val name: String,

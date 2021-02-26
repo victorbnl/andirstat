@@ -3,6 +3,7 @@ package com.victorb.andirstat
 import android.os.StatFs
 import androidx.documentfile.provider.DocumentFile
 import com.anggrayudi.storage.file.absolutePath
+import com.victorb.andirstat.data.FileInfos
 import java.text.CharacterIterator
 import java.text.StringCharacterIterator
 

@@ -1,25 +1,15 @@
-package com.victorb.andirstat
+package com.victorb.andirstat.activities
 
-import android.Manifest
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.anggrayudi.storage.SimpleStorageHelper
-import com.anggrayudi.storage.file.absolutePath
+import com.victorb.andirstat.R
+import com.victorb.andirstat.adapters.FilesAdapter
 
 class MainActivity : AppCompatActivity() {
     private lateinit var storageHelper: SimpleStorageHelper
