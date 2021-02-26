@@ -3,9 +3,7 @@ package com.victorb.andirstat
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,6 +32,8 @@ class MainActivity : AppCompatActivity() {
         // Setup the toolbar
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        println(StatFs("/").totalBytes)
 
         checkPermissionsAndInitRecyclerView(this)
     }

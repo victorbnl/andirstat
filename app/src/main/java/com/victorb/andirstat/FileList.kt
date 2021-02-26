@@ -1,5 +1,6 @@
 package com.victorb.andirstat
 
+import android.os.StatFs
 import java.io.File
 
 class FileList {
@@ -11,7 +12,7 @@ class FileList {
             fileList.add(FileInfos(file.path,
                 file.name,
                 getFileSize(file),
-                if (file.parentFile != File("/")) getFileSize(file.parentFile) else 16000000000,
+                if (file.absolutePath != "/sdcard") getFileSize(file.parentFile) else StatFs("/sdcard").totalBytes,
                 file.parent,
                 file.isDirectory))
         }

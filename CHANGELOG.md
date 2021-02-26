@@ -6,6 +6,10 @@
 
 - Changes in code structure
 
+### Fixed
+
+- Hardcoded value of device size
+
 ## [0.3.0](https://github.com/victorbnl/andirstat/releases/tag/v0.3.0) - 2021-02-26
 
 ### Added
