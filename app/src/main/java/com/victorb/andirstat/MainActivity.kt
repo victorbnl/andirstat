@@ -64,6 +64,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initAdapterWithRootFolder() {
         storageHelper.onFolderSelected = { _: Int, folder: DocumentFile ->
+            Toast.makeText(this, "Scanning your files, this may take up to 5 mins", Toast.LENGTH_LONG).show()
             adapter.setRootFolder(folder)
         }
         storageHelper.openFolderPicker()
@@ -71,7 +72,6 @@ class MainActivity : AppCompatActivity() {
 
     class FilesAdapter() : RecyclerView.Adapter<FilesAdapter.ViewHolder>() {
         private lateinit var rootFolder: DocumentFile
-        private lateinit var rootFolderPath: String
         private lateinit var fileList: MutableList<FileInfos>
         private var filesToDisplay: MutableList<FileInfos> = mutableListOf()
 
@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity() {
             holder.sizeBar.progress = (100 * (file.size.toFloat() / file.parentSize.toFloat())).toInt()
             holder.sizeBar.max = 100
             if (file.isDirectory) {
-                holder.itemView.setOnClickListener { updateFilesToDisplay(file.path, if (file.parentPath == rootFolderPath) file.parentPath else null) }
+                holder.itemView.setOnClickListener { updateFilesToDisplay(file.path, if (file.parentPath == rootFolder.absolutePath) file.parentPath else null) }
             } else {
                 holder.itemView.setOnClickListener {  }
             }
@@ -125,9 +125,8 @@ class MainActivity : AppCompatActivity() {
         fun setRootFolder(folder: DocumentFile) {
             runInCoroutine {
                 rootFolder = folder
-                rootFolderPath = folder.absolutePath
                 fileList = getAllChildren(rootFolder)
-                updateFilesToDisplay(rootFolderPath, null)
+                updateFilesToDisplay(rootFolder.absolutePath, null)
                 runOnMainThread { notifyDataSetChanged() }
             }
         }
