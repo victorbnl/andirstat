@@ -114,18 +114,18 @@ class MainActivity : AppCompatActivity() {
                         filesToDisplay.add(file)
                     }
                 }
+                filesToDisplay.sortByDescending { it.size }
                 if (folderParentPath != null) {
                     filesToDisplay.add(0, FileInfos("..", folderParentPath, 0, 0, "",true))
                 }
-                filesToDisplay.sortByDescending { it.size }
                 runOnMainThread { notifyDataSetChanged() }
             }
         }
 
         fun setRootFolder(folder: DocumentFile) {
-            rootFolder = folder
-            rootFolderPath = folder.absolutePath
             runInCoroutine {
+                rootFolder = folder
+                rootFolderPath = folder.absolutePath
                 fileList = getAllChildren(rootFolder)
                 updateFilesToDisplay(rootFolderPath, null)
                 runOnMainThread { notifyDataSetChanged() }
