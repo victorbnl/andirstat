@@ -11,8 +11,8 @@ android {
         applicationId "com.victorb.andirstat"
         minSdkVersion 23
         targetSdkVersion 26
-        versionCode 200000
-        versionName "0.2.0"
+        versionCode 300000
+        versionName "0.3.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
