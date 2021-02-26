@@ -5,6 +5,7 @@
 ### Added
 
 - Changes in code structure
+- The usage of SAF (so a whole refactor basically)
 
 ### Fixed
 
