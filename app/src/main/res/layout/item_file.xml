@@ -31,13 +31,15 @@
 
     <TextView
         android:id="@+id/filename"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="1dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="1dp"
         android:text="File name"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/filesize"
         app:layout_constraintStart_toEndOf="@+id/fileicon"
         app:layout_constraintTop_toTopOf="parent" />
 

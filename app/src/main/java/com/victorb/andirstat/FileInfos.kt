@@ -1,7 +1,5 @@
 package com.victorb.andirstat
 
-import androidx.documentfile.provider.DocumentFile
-
 data class FileInfos(
         val name: String,
         val path: String,

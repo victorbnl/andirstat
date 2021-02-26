@@ -1,5 +1,6 @@
 package com.victorb.andirstat
 
+import android.os.StatFs
 import androidx.documentfile.provider.DocumentFile
 import com.anggrayudi.storage.file.absolutePath
 import java.text.CharacterIterator
@@ -10,7 +11,7 @@ var fileSizes: MutableMap<String, Long> = mutableMapOf()
 fun getAllChildren(rootFile: DocumentFile, fileList: MutableList<FileInfos> = mutableListOf()): MutableList<FileInfos> {
     for (file in rootFile.listFiles()) {
         if (file.isDirectory) {
-            fileList.add(FileInfos(file.name!!, file.absolutePath, getFolderSize(file), getFolderSize(file.parentFile!!), file.parentFile!!.absolutePath, file.isDirectory))
+            fileList.add(FileInfos(file.name!!, file.absolutePath, getFolderSize(file), if (file.parentFile!!.absolutePath != "/") getFolderSize(file.parentFile!!) else StatFs(file.absolutePath).totalBytes, file.parentFile!!.absolutePath, file.isDirectory))
             getAllChildren(file, fileList)
         } else {
             fileList.add(FileInfos(file.name!!, file.absolutePath, file.length(), getFolderSize(file.parentFile!!), file.parentFile!!.absolutePath, file.isDirectory))
@@ -23,11 +24,7 @@ fun getFolderSize(folder: DocumentFile): Long {
     fileSizes[folder.absolutePath]?.let { return it }
     var size: Long = 0
     for (file in folder.listFiles()) {
-        if (file.isDirectory) {
-            size += getFolderSize(file)
-        } else {
-            size += file.length()
-        }
+        size += if (file.isDirectory) getFolderSize(file) else file.length()
     }
     fileSizes[folder.absolutePath] = size
     return size

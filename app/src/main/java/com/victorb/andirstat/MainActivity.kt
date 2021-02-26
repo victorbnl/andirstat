@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity() {
             holder.sizeBar.progress = (100 * (file.size.toFloat() / file.parentSize.toFloat())).toInt()
             holder.sizeBar.max = 100
             if (file.isDirectory) {
-                holder.itemView.setOnClickListener { updateFilesToDisplay(file.path, file.parentPath) }
+                holder.itemView.setOnClickListener { updateFilesToDisplay(file.path, if (file.parentPath == rootFolderPath) file.parentPath else null) }
             } else {
                 holder.itemView.setOnClickListener {  }
             }
