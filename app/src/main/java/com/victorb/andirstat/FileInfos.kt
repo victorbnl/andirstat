@@ -1,12 +1,12 @@
 package com.victorb.andirstat
 
-import java.io.File
+import androidx.documentfile.provider.DocumentFile
 
 data class FileInfos(
-    val path: String,
-    val name: String,
-    val size: Long,
-    val parentSize: Long,
-    val parentPath: String,
-    val isDirectory: Boolean
+        val name: String,
+        val path: String,
+        val size: Long,
+        val parentSize: Long,
+        val parentPath: String,
+        val isDirectory: Boolean
 )

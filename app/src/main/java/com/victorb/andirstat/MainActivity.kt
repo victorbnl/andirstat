@@ -2,8 +2,9 @@ package com.victorb.andirstat
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.*
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,16 +15,16 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.io.File
-import java.text.CharacterIterator
-import java.text.StringCharacterIterator
+import com.anggrayudi.storage.SimpleStorageHelper
+import com.anggrayudi.storage.file.absolutePath
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var storageHelper: SimpleStorageHelper
+    private var adapter = FilesAdapter()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Defaults tasks
         super.onCreate(savedInstanceState)
@@ -33,9 +34,13 @@ class MainActivity : AppCompatActivity() {
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        println(StatFs("/").totalBytes)
+        // Setup recyclerView
+        val recyclerView: RecyclerView = findViewById(R.id.files_recycler)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
 
-        checkPermissionsAndInitRecyclerView(this)
+        storageHelper = SimpleStorageHelper(this, savedInstanceState)
+        initAdapterWithRootFolder()
     }
 
     private fun checkPermissionsAndInitRecyclerView(context: Context) {
@@ -48,29 +53,27 @@ class MainActivity : AppCompatActivity() {
                         Toast.LENGTH_LONG
                     ).show()
                 } else {
-                    initRecyclerView()
+                    initAdapterWithRootFolder()
                 }
             }
             requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
         } else {
-            initRecyclerView()
+            initAdapterWithRootFolder()
         }
     }
 
-    private fun initRecyclerView() {
-        val recyclerView: RecyclerView = findViewById(R.id.files_recycler)
-        val adapter = FilesAdapter()
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = adapter
+    private fun initAdapterWithRootFolder() {
+        storageHelper.onFolderSelected = { _: Int, folder: DocumentFile ->
+            adapter.setRootFolder(folder)
+        }
+        storageHelper.openFolderPicker()
     }
 
     class FilesAdapter() : RecyclerView.Adapter<FilesAdapter.ViewHolder>() {
-        private val fileList: FileList = FileList()
-        private var dataSet: MutableList<FileInfos> = mutableListOf()
-
-        init {
-            updateFileList("/sdcard")
-        }
+        private lateinit var rootFolder: DocumentFile
+        private lateinit var rootFolderPath: String
+        private lateinit var fileList: MutableList<FileInfos>
+        private var filesToDisplay: MutableList<FileInfos> = mutableListOf()
 
         class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val iconView: ImageView = view.findViewById(R.id.fileicon)
@@ -88,57 +91,60 @@ class MainActivity : AppCompatActivity() {
             )
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val file: FileInfos = dataSet[position]
+            val file: FileInfos = filesToDisplay[position]
             holder.fileName.text = file.name
             holder.fileSize.text = fileSizeToHumanReadable(file.size)
+            holder.iconView.setImageResource(if (file.isDirectory) R.drawable.ic_folder else R.drawable.ic_file)
             holder.sizeBar.progress = (100 * (file.size.toFloat() / file.parentSize.toFloat())).toInt()
             holder.sizeBar.max = 100
-            holder.iconView.setImageResource(if (file.isDirectory) R.drawable.ic_folder else R.drawable.ic_file)
             if (file.isDirectory) {
-                holder.itemView.setOnClickListener {
-                    updateDataSet(file.path)
-                }
+                holder.itemView.setOnClickListener { updateFilesToDisplay(file.path, file.parentPath) }
             } else {
                 holder.itemView.setOnClickListener {  }
             }
         }
 
-        override fun getItemCount(): Int = dataSet.size
+        override fun getItemCount(): Int = filesToDisplay.size
 
-        private fun updateFileList(rootDirectory: String) {
-            CoroutineScope(Dispatchers.IO).launch {
-                fileList.clearList()
-                fileList.fillList(rootDirectory)
-                updateDataSet(rootDirectory)
+        private fun updateFilesToDisplay(folderPath: String, folderParentPath: String?) {
+            runInCoroutine {
+                filesToDisplay.clear()
+                for (file in fileList) {
+                    if (file.parentPath == folderPath) {
+                        filesToDisplay.add(file)
+                    }
+                }
+                if (folderParentPath != null) {
+                    filesToDisplay.add(0, FileInfos("..", folderParentPath, 0, 0, "",true))
+                }
+                filesToDisplay.sortByDescending { it.size }
+                runOnMainThread { notifyDataSetChanged() }
             }
         }
 
-        private fun updateDataSet(rootDirectory: String) {
-            dataSet = fileList.getDirectoryFiles(rootDirectory)
-            if (rootDirectory != "/sdcard") {
-                dataSet.add(0, FileInfos(File(rootDirectory).parent, "..", 0, 0, "", true))
+        fun setRootFolder(folder: DocumentFile) {
+            rootFolder = folder
+            rootFolderPath = folder.absolutePath
+            runInCoroutine {
+                fileList = getAllChildren(rootFolder)
+                updateFilesToDisplay(rootFolderPath, null)
+                runOnMainThread { notifyDataSetChanged() }
             }
-            runOnMainThread { notifyDataSetChanged() }
         }
+    }
 
-        // https://stackoverflow.com/questions/3758606/how-can-i-convert-byte-size-into-a-human-readable-format-in-java
-        fun fileSizeToHumanReadable(bytes: Long): String? {
-            var bytes = bytes
-            if (-1000 < bytes && bytes < 1000) {
-                return "$bytes B"
-            }
-            val ci: CharacterIterator = StringCharacterIterator("kMGTPE")
-            while (bytes <= -999950 || bytes >= 999950) {
-                bytes /= 1000
-                ci.next()
-            }
-            return java.lang.String.format("%.1f %cB", bytes / 1000.0, ci.current())
-        }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        storageHelper.storage.onActivityResult(requestCode, resultCode, data)
+    }
 
-        private fun runOnMainThread(callback: () -> Unit) {
-            Handler(Looper.getMainLooper()).post {
-                callback.invoke()
-            }
-        }
+    override fun onSaveInstanceState(outState: Bundle) {
+        storageHelper.storage.onSaveInstanceState(outState)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        storageHelper.storage.onRestoreInstanceState(savedInstanceState)
     }
 }

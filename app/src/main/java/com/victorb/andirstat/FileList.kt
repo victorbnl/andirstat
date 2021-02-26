@@ -3,7 +3,7 @@ package com.victorb.andirstat
 import android.os.StatFs
 import java.io.File
 
-class FileList {
+/*class FileList {
     private val fileList: MutableList<FileInfos> = mutableListOf()
     private val folderSizes: MutableMap<String, Long> = mutableMapOf()
 
@@ -47,4 +47,4 @@ class FileList {
         }
         return results
     }
-}
+}*/
