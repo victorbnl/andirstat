@@ -10,14 +10,18 @@ class FileList {
         File(rootFolder).walk().forEach { file: File ->
             fileList.add(FileInfos(file.path,
                 file.name,
-                getSize(file),
-                if (file.parentFile != File("/")) getSize(file.parentFile) else 16000000000,
+                getFileSize(file),
+                if (file.parentFile != File("/")) getFileSize(file.parentFile) else 16000000000,
                 file.parent,
                 file.isDirectory))
         }
     }
 
-    fun getSize(directory: File): Long {
+    fun clearList() {
+        fileList.clear()
+    }
+
+    private fun getFileSize(directory: File): Long {
         return if (folderSizes[directory.absolutePath] != null) {
             folderSizes[directory.absolutePath] as Long
         } else {
@@ -29,8 +33,6 @@ class FileList {
             size
         }
     }
-
-    fun getFileList(): MutableList<FileInfos> = fileList
 
     fun getDirectoryFiles(directory: String): MutableList<FileInfos> {
         val results: MutableList<FileInfos> = mutableListOf()

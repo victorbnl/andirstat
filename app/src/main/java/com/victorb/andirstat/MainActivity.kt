@@ -35,18 +35,10 @@ class MainActivity : AppCompatActivity() {
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        checkPermissions(this)
-
-        Toast.makeText(this, "Scanning your files...", Toast.LENGTH_LONG).show()
-
-        // Set up the recycler view
-        val recyclerView: RecyclerView = findViewById(R.id.files_recycler)
-        val adapter = FilesAdapter()
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = adapter
+        checkPermissionsAndInitRecyclerView(this)
     }
 
-    private fun checkPermissions(context: Context) {
+    private fun checkPermissionsAndInitRecyclerView(context: Context) {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
                 if (!isGranted) {
@@ -55,10 +47,21 @@ class MainActivity : AppCompatActivity() {
                         "Please allow the app to access your files",
                         Toast.LENGTH_LONG
                     ).show()
+                } else {
+                    initRecyclerView()
                 }
             }
             requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+        } else {
+            initRecyclerView()
         }
+    }
+
+    private fun initRecyclerView() {
+        val recyclerView: RecyclerView = findViewById(R.id.files_recycler)
+        val adapter = FilesAdapter()
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
     }
 
     class FilesAdapter() : RecyclerView.Adapter<FilesAdapter.ViewHolder>() {
@@ -66,10 +69,7 @@ class MainActivity : AppCompatActivity() {
         private var dataSet: MutableList<FileInfos> = mutableListOf()
 
         init {
-            CoroutineScope(Dispatchers.IO).launch {
-                fileList.fillList("/sdcard")
-                updateDataSet("/sdcard")
-            }
+            updateFileList("/sdcard")
         }
 
         class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -93,18 +93,25 @@ class MainActivity : AppCompatActivity() {
             holder.fileSize.text = fileSizeToHumanReadable(file.size)
             holder.sizeBar.progress = (100 * (file.size.toFloat() / file.parentSize.toFloat())).toInt()
             holder.sizeBar.max = 100
-            println("FILE : " + file.path)
-            println("SIZE : " + file.size.toFloat())
-            println("PARENT SIZE : " + file.parentSize.toFloat())
             holder.iconView.setImageResource(if (file.isDirectory) R.drawable.ic_folder else R.drawable.ic_file)
             if (file.isDirectory) {
                 holder.itemView.setOnClickListener {
                     updateDataSet(file.path)
                 }
+            } else {
+                holder.itemView.setOnClickListener {  }
             }
         }
 
         override fun getItemCount(): Int = dataSet.size
+
+        private fun updateFileList(rootDirectory: String) {
+            CoroutineScope(Dispatchers.IO).launch {
+                fileList.clearList()
+                fileList.fillList(rootDirectory)
+                updateDataSet(rootDirectory)
+            }
+        }
 
         private fun updateDataSet(rootDirectory: String) {
             dataSet = fileList.getDirectoryFiles(rootDirectory)
