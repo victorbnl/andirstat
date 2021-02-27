@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initAdapterWithRootFolder() {
         storageHelper.onFolderSelected = { _: Int, folder: DocumentFile ->
-            Toast.makeText(this, "Tout vient à qui sait attendre", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Tout vient au point à qui sait attendre", Toast.LENGTH_LONG).show()
             adapter.setRootFolder(folder)
         }
         storageHelper.openFolderPicker()
