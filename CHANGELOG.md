@@ -6,6 +6,7 @@
 
 - Changes in code structure
 - The usage of SAF (so a whole refactor basically)
+- A funny (I guess?) message to tell the user it's scanning
 
 ### Fixed
 
